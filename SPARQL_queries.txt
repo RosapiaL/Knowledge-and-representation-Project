@@ -1,0 +1,106 @@
+1. This query returns all animals that eat a carnivorous diet.
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX mykindom: <http://www.semanticweb.org/rosil/ontologies/2024/7/animal-kindom#>
+
+SELECT ?animal WHERE {
+  ?animal rdf:type mykindom:Animal .
+  ?animal mykindom:hasDiet "Carnivore" .
+}
+
+
+2. Returns all the animals that are prey to the lion and that live in the savanna.
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX mykindom: <http://www.semanticweb.org/rosil/ontologies/2024/7/animal-kindom#>
+SELECT ?prey WHERE {
+  ?prey mykindom:hasPredator mykindom:Lion .
+  ?prey mykindom:hasHabitat ?x.
+  ?x rdf:type mykindom:Savanna
+}
+
+
+3.This query lists all birds that migrate to a specific country and live in the forest.
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX mykindom: <http://www.semanticweb.org/rosil/ontologies/2024/7/animal-kindom#>
+SELECT DISTINCT ?bird ?country WHERE {
+  ?bird rdf:type mykindom:Bird .
+  ?bird mykindom:migratesTo ?country .
+  ?bird mykindom:hasHabitat ?y .
+  ?y rdf:type mykindom:Forest
+}
+
+
+4. This query returns all warm blooded animals and, optionally, their predators.
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX mykindom: <http://www.semanticweb.org/rosil/ontologies/2024/7/animal-kindom#>
+SELECT ?wb ?predator WHERE {
+  ?wb rdf:type mykindom:WarmBlooded .
+  OPTIONAL {?wb mykindom:hasPredator ?predator}
+}
+
+
+5. Query with UNION and FILTER: Find all animals (both vertebrates and invertebrates) that weigh less than 100 kg or are less than 2 meters long.
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX mykindom: <http://www.semanticweb.org/rosil/ontologies/2024/7/animal-kindom#>
+SELECT  ?animal (STR(?weight) AS ?weightLiteral) (STR(?size) AS ?sizeLiteral) WHERE {
+  {
+    ?animal rdf:type mykindom:Vertebrate .
+    { ?animal mykindom:hasWeight ?weight . }
+   UNION
+   { ?animal mykindom:hasMaxWeight ?weight . }
+   FILTER( ?weight < 100 )
+  }
+  UNION
+  {
+    ?animal rdf:type mykindom:Invertebrate .
+    ?animal mykindom:hasSize ?size .
+    FILTER(?size < 2)
+  }
+}
+
+6. Find mammals and birds that live in the Savannah, list their size, diet and predators, including any optional predators.
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX mykindom: <http://www.semanticweb.org/rosil/ontologies/2024/7/animal-kindom#>
+SELECT DISTINCT ?animal (STR(?size) AS ?sizeLiteral) ?diet ?predator 
+WHERE {
+  {
+    ?animal rdf:type mykindom:Mammal .
+    ?animal mykindom:hasHabitat ?habitat .
+    ?habitat rdf:type mykindom:Savanna.
+    ?animal mykindom:hasSize ?size .
+    ?animal mykindom:hasDiet ?diet .
+    OPTIONAL { ?animal mykindom:hasPredator ?predator . }
+  }
+  UNION
+  {
+    ?animal rdf:type mykindom:Bird .
+      ?animal mykindom:hasHabitat ?habitat .
+    ?habitat rdf:type mykindom:Savanna.
+    ?animal mykindom:hasSize ?size .
+    ?animal mykindom:hasDiet ?diet .
+    OPTIONAL { ?animal mykindom:hasPredator ?predator . }
+  }}
+

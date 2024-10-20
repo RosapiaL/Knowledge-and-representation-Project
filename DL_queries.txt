@@ -1,0 +1,23 @@
+#1 All mammals that are larger than 1.5 meters:
+
+Mammal and hasSize some xsd:decimal[>1.5]
+
+
+#2 All animals that live in a forest and are smaller than 1.5 meters:
+
+Vertebrate and hasHabitat some Forest and hasSize some xsd:decimal[<1.5]
+
+
+#3 Vertebrates introduced to United_Kindom
+
+Vertebrate and introducedToCountry value United_Kindom
+
+
+#4 Mammals that have at least 2 predators
+
+Mammal and hasPredator min 2
+
+
+#5 All animals that have as predator the eagle and are not birds: 
+
+Animal and hasPredator value Eagle and not(Bird)
